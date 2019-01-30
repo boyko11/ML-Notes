@@ -105,3 +105,7 @@
 * weighted linear combination of the same thing, is the thing itself. The weights would also be the same since hypothetically the ANN fit the data perfectly
 * If you have an underlying weak learner that overfits, it is difficult for boosting to overcome that
 * Boosting can also overfit in the case of pink noise(uniform noise)
+* SVMs are Linear Learning Machines that
+** Use a dual representation
+** Operate in a Kernel induced feature space - f(x)=∑αiyi φ(xi),φ(x) +b  is a linear function in the feature space implicitly defined by K
+* Bad Kernel would have a mostly diagonal Kernel matrix - all points orthogonal to each other - no structure, no clusters
