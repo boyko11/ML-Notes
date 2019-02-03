@@ -106,6 +106,81 @@
 * If you have an underlying weak learner that overfits, it is difficult for boosting to overcome that
 * Boosting can also overfit in the case of pink noise(uniform noise)
 * SVMs are Linear Learning Machines that
-** Use a dual representation
-** Operate in a Kernel induced feature space - f(x)=∑αiyi φ(xi),φ(x) +b  is a linear function in the feature space implicitly defined by K
+	** Use a dual representation
+	** Operate in a Kernel induced feature space - f(x)=∑αiyi φ(xi),φ(x) +b  is a linear function in the feature space implicitly defined by K
 * Bad Kernel would have a mostly diagonal Kernel matrix - all points orthogonal to each other - no structure, no clusters
+
+## Comp Learning Theory
+
+* Consistent Learner - learner consistent with the data - learned to produce the the training labels
+* Version Space - all the hypotheses consistent with the training data(all the correct hypotheses with respect to the training data)
+* True error vs Training error
+	* Training error is the percentage misclassified from the training set
+	* True error is the probability that the classifier will incorrectly classify data drawn from the true distribution
+	* It's OK to misclassify examples you will almost never see - since they are so rare, they will not impact the true error much
+	* On the other hand you want to correctly classify common examples, so you have a low true error
+* Version Space is epsilon-exhausted iff all the hypotheses in the Version space have error <= epsilon
+* Hausler Theorem: m >= 1/epsilon * (ln(|H|) + ln(1/delta)) - upper bound on training samples that the Version Space is not epsilon exhausted - 
+* If you know the size of your Hypothesis Space and you know what your target epsilon and delta are, from the above line, you'd know how many samples you need so you can be PAC
+
+## VC Dimensions
+
+* Size of Hypothesys Space - infinite in many cases - ANN, Linear Regression, SVM, DT with continuous attributes
+* Syntactic-write(infinite) - sometimes it is posssible to convert it to  Semantic - meaningfully different - eliminate lots of hypothesis based on the observed data, e.g. data between 1 and 10, if you have to threshold it, do not consider hypos where the threshold param is less than 0 or greater than 10
+* Syntactic - all the possible hypotheses one can write
+* Semantic - all the possible hyotheses that are meaningfully different from one another, e.g from previous example theta < 11, theta < 12, theta < 13, are NOT meaningfully different since they will all produce the same answer
+* Power of Hypothesis space - what is the largest set of Inputs that the hypothesis class can label in all possible ways (shatter)? - the numeric answer of this is called VC Dimension
+* VC Dimensions relay to the amount of data needed to learn in hypothesis class
+* As long as VC Dimensions are finite, even if the hypo class is infinite, we will be able to say, how much data we need to be able to learn
+* Examples how many ways can you shatter inputs to a function which returns interval membership:
+* 1 - 2 ways = the number of all possible ways
+* 2 - 4 ways = --||--
+* 3 - all possible ways = 2^3, but you can't shatter three points into a T F T arrangement, so you can't shatter an input set of 3 to 8 possible outcomes => VC Dimensions = 2
+* It's easier to get a lower bound, less hypothesis - show that there EXISTS some set of points that can shatter the hypothesys class
+* For upper bound you have to prove that NO example exists that can shatter the hypo class
+* VC dimension is often the number of parameters - threshold in 1D - 1 (theta); interval in 1D - 2 ([a, b]) separator line in 2D - 3 (w1x1 + w2x2 +b);
+* 3 dimensions - 4; d-dimensional hyperplane - d+1 - d the weights for each dimensions + theta(the threshold)
+* __m <= (1/epsilon)(8*VC(H)*log2(13/epsilon) + 4*log2(2/epsilon))__ 
+* The VC dimension concept it doesn't require hypothesys class be infinite, it's just that an infinite hypothesys class requires a VC dimension
+* What is the VC dimension of a finite hypothesys class: 
+* if d = VC(H) => there are 2^d distinct hypothesys => 2^d <= |H| => d = log2(|H|)
+* A finite hypo class, or a finite VC dimension give us finite bounds, hence make things PAC learnable
+* H is PAC learnanble iff the VC dimension is finite
+
+## Bayesian Learning
+
+* Learn the most probable hypo given data and some domain knowledge argmax_h Pr(h | Data)
+* Bayes Rule - Pr(h | Data) = ( Pr(Data | h) * Pr(h) ) / Pr(Data) derived from Pr(h, D) = Pr(h | D) * Pr(D) = Pr(D | h) * Pr(h) => Pr(h | D) = ( Pr(D | h) * Pr(h) ) / Pr(D)
+* Pr(D) - prior on the data - we typically ignore it
+* Pr(D | h) - the likelihood we will see the data, given that the hypo h is true = the probability we will see the training labels for the specific hypothesis
+* Pr(h) - prior on the hypothesys - capture our prior belief that this hypo is likely or unlikely compared to other hypos; This is our domain knowledge
+* Bayesian Learning:
+	* For each h in H
+		* calculate Pr(h|D) ~ Pr(D|h) * Pr(h)
+	* h_map = argmax_h Pr(h|D) map - max aposteriori
+	* h_ml = argmax_h Pr(D|h) (we dropped the Pr(h)) ml = maximum likelihood - we use this if we assume all h are equally likely(come from an uniform distribution), so Pr(h) will always be the same in the Pr(D|h) * Pr(h) calculation => Pr(h|D) ~ Pr(D|h)
+* The above formulation is nice in math terms, but it is not computationally feasible for large hypothesys spaces
+* in a noise free world - Pr(h|D) = 1/|VS| - https://classroom.udacity.com/courses/ud262/lessons/454308909/concepts/4733385550923
+* Noise free world, the true concept is in the Hypo space, all hypos are equally likely:
+	* Pr(h) = 1 / |H|
+	* Pr(D|h) = 1 if h gets all labels correctly, 0 otherwise
+	* Pr(D) = Sigma_h_i_over_hypo_space(Pr(D| h_i)*Pr(h_i)) - Pr(D| h_i) will be 1 if h_i is in the Version Space(VS), 0 otherwise => Pr(D) = Sigma_h_overVS(1 * 1/||H||) = ||VS||/||H|| =>
+	* Pr(h | D) = (1 * (1 / ||H||) ) / (||VS|| / ||H||) = 1 / ||VS|| if h belongs to the VS == just pick something from the consistent set of hypos
+* h_ml = argmax_h Pr(h | D) = argmax_h Pr(D | h) = argmax_h Product_i(label_i | h) = argmax_h Product_i gausian formula for label_i
+* The log of a product is the same as the sum of the logs, and the log of e to something is just that thing hence:
+* argmax_h Product_i gausian formula for label_i = argmax_h Sum_i(-1/2* (label_i - h(x_i))^2) / sigma^2), we just took a log of the product to make things easier
+* argmax_h Sum_i(-1/2* (label_i - h(x_i))^2) / sigma^2) = -argmax_h Sum_i( label_i - h(x_i))^2 )
+* -argMAX_h Sum_i( label_i - h(x_i))^2 ) = argMIN_h Sum_i( label_i - h(x_i))^2 ) - sum of squared errors giving us the ML hypo is based on Bayesian Learning
+* minimizing the sum of squared errors between the labels and the predicted labels gives us the ML hypothesis
+* assumptions for ML to work - uncorrelated, independently drawn, gaussian noise with mean zero
+* when you are minimizing the SSE, you are assuming the data that you have is corrupted by gaussian noise, if that's not the case, you are doing the wrong thing 
+
+* The maximum apriori hypo is the one that minimizes error and minimizes the size of your hypo:
+* h_map = argmax_h Pr(D|h)*Pr(h) = argmax_h ( lg(Pr(D|h) + lg(Pr(h))) ) = argmin_h( -lg(Pr(D|h)) - lg(Pr(h)))
+* the above is the same as argmin_h(length(D|h) + length(h)) - The maximum apriori hypo is the one that minimizes error and minimizes the size of your hypo
+* In other words - you want the simplest hypo that minimizes your error
+* The name of all this is Minimum Description Error
+* there is often a trade-off between the two terms - if I get more complected(lengthy) hypo, I can drive the error down
+* I could sacrifice accuracy for a simpler(less lengthy) hypo
+* The best hypo is the one that minimizes the error, without paying to much price for overcomplicating the hypo
+* an NN example would be big weights - we gonna need more bits(more lenght) do describe larger weights, the larger the weight, the more we overfit
