@@ -184,3 +184,13 @@
 * I could sacrifice accuracy for a simpler(less lengthy) hypo
 * The best hypo is the one that minimizes the error, without paying to much price for overcomplicating the hypo
 * an NN example would be big weights - we gonna need more bits(more lenght) do describe larger weights, the larger the weight, the more we overfit
+
+## Bayesian Inference
+* Topological Sort Graph must by a directed asyclic graph
+* The fewer the parents the more compact the distribution
+* Marginalization: P(x) = Sigma_y(P(x, y))
+* Conditional Prob: P(x, y) = P(y|x)*P(x) = P(x|y)*P(y)  if x and y are independent of one another = P(x, y) = P(x) * P(y)
+* Bayes Rule: P(y|x) = ( P(x|y)*P(y) ) / P(x)
+
+* Naive Bayes:  P(V|a1, a2,.....,a_n) = ( Product_i(P(a_i | V)) * P(V) ) / Z ; Z is normalization over P(a_i | V)
+* MAP(Max aposteriori) CLass = argmax_v P(V) * Product_i(P(a_i | V))
