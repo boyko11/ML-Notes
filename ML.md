@@ -151,7 +151,7 @@
 
 * Learn the most probable hypo given data and some domain knowledge argmax_h Pr(h | Data)
 * Bayes Rule - Pr(h | Data) = ( Pr(Data | h) * Pr(h) ) / Pr(Data) derived from Pr(h, D) = Pr(h | D) * Pr(D) = Pr(D | h) * Pr(h) => Pr(h | D) = ( Pr(D | h) * Pr(h) ) / Pr(D)
-* Pr(D) - prior on the data - we typically ignore it
+* Pr(D) - prior on the data - we typically ignore it - Sigma_i(P(D| h_i)) - normalization factor
 * Pr(D | h) - the likelihood we will see the data, given that the hypo h is true = the probability we will see the training labels for the specific hypothesis
 * Pr(h) - prior on the hypothesys - capture our prior belief that this hypo is likely or unlikely compared to other hypos; This is our domain knowledge
 * Bayesian Learning:
@@ -159,6 +159,7 @@
 		* calculate Pr(h|D) ~ Pr(D|h) * Pr(h)
 	* h_map = argmax_h Pr(h|D) map - max aposteriori
 	* h_ml = argmax_h Pr(D|h) (we dropped the Pr(h)) ml = maximum likelihood - we use this if we assume all h are equally likely(come from an uniform distribution), so Pr(h) will always be the same in the Pr(D|h) * Pr(h) calculation => Pr(h|D) ~ Pr(D|h)
+	* h_ml is h_map if the prior (P(h)) is uniform
 * The above formulation is nice in math terms, but it is not computationally feasible for large hypothesys spaces
 * in a noise free world - Pr(h|D) = 1/|VS| - https://classroom.udacity.com/courses/ud262/lessons/454308909/concepts/4733385550923
 * Noise free world, the true concept is in the Hypo space, all hypos are equally likely:
@@ -184,6 +185,8 @@
 * I could sacrifice accuracy for a simpler(less lengthy) hypo
 * The best hypo is the one that minimizes the error, without paying to much price for overcomplicating the hypo
 * an NN example would be big weights - we gonna need more bits(more lenght) do describe larger weights, the larger the weight, the more we overfit
+* Bayes Optiml Classifier -  on average you canNOT do any better than doing a weighted vote of all the hypotheses according to the hypothesis given the data
+* Bayesian Learning gives the ability to talk optimality and gold standards
 
 ## Bayesian Inference
 * Topological Sort Graph must by a directed asyclic graph
