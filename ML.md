@@ -157,7 +157,7 @@
 * Bayesian Learning:
 	* For each h in H
 		* calculate Pr(h|D) ~ Pr(D|h) * Pr(h)
-	* h_map = argmax_h Pr(h|D) map - max aposteriori
+	* h_map = argmax_h Pr(h|D) map - max aposteriori - largest posterior given all your priors
 	* h_ml = argmax_h Pr(D|h) (we dropped the Pr(h)) ml = maximum likelihood - we use this if we assume all h are equally likely(come from an uniform distribution), so Pr(h) will always be the same in the Pr(D|h) * Pr(h) calculation => Pr(h|D) ~ Pr(D|h)
 	* h_ml is h_map if the prior (P(h)) is uniform
 * The above formulation is nice in math terms, but it is not computationally feasible for large hypothesys spaces
@@ -185,6 +185,8 @@
 * I could sacrifice accuracy for a simpler(less lengthy) hypo
 * The best hypo is the one that minimizes the error, without paying to much price for overcomplicating the hypo
 * an NN example would be big weights - we gonna need more bits(more lenght) do describe larger weights, the larger the weight, the more we overfit
+* in NNs The complexity is not in the number of parameters directly, but in how many bits you need to represent the value of parameters - 
+* I can have 10 params and they are all binary => I need 10 bits; if this 10 params are arbitrary large numbers instead, I'd need arbitrary many bits to represent them
 * Bayes Optiml Classifier -  on average you canNOT do any better than doing a weighted vote of all the hypotheses according to the hypothesis given the data
 * Bayesian Learning gives the ability to talk optimality and gold standards
 
