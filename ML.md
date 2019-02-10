@@ -278,3 +278,43 @@
 * Mimic usually takes far fewer iterations, but the per iteration cost if far greater - prims algo, draw from distro, remove unfit Xs, estimate probabilities, construct dependency tree, etc
 * Mimic is worth using when the Fitness function is very expensive - since there are far fewer iterations, you'd have to compute the fitness function for every X, far fewer times
 * Examples of expensive fitness functions: function the performs a detail simulation of how a rocket ship performs
+
+## Information Theory
+* If a sequence is predictable, i.e. has LESS uncertainty, then it has LESS information - Shannon described this as Entropy:
+* If you had to predict the next symbol in a sequence - what is the miminum number of yes/no questions you would expect to ask.
+* 10 coin flips of a fair coin - you'd have to ask 10 questions to figure out the sequence - Information(Entropy) is 1
+* 10 coin flips of a coin that always turns up heads - you won't need to ask any questions - Information(Entropy) is 0
+* Variable length encoding - symbols that occur more often we encode with less bits, symbols that occur less often, we encode with more bits - this way we save on the amount of bits needed to be transmitted. this also explains why morse code symbols are encoded with variable length
+* Example(tree below) A - 50% (0), B -12.5%(110), C - 12.5%(111), D - 25%(10)
+
+       /\
+   A  0  1
+      	 /\
+    D   0  1
+           /\
+        B 0  1 C
+
+ * Expected questions per bit .5 * 1 + .125 * 3 + .125 * 3 + .25*2 = 1.75
+ * Since we had to ask less questions with this language, this language has less information compared to a language where A,B,C,D have uniform probability
+ * Number of bits per symbol:
+ 	* SIGMA_symbols(P(symbol)*number_of_bits_to_encode_the_symbol)
+ * This is also called Entropy
+ * The number of bits to encode the particular symbol can also be represented as log(1/P(symbol))    
+ * e.g symbol A - P = 1/2 - log(1/(1/2)) = 1; symbol D - P = 1/4 - log(1/(1/4)) = 2; symbol B,C - P = 1/8 - log(1/(1/8)) = 3
+ * Entropy = Sigma( P(symbol) * log(1/P(symbol))) <==> -Sigma( P(symbol) * log(P(symbol)))
+ * Joint Entropy - randomness contained in two variables together:
+ 	* H(x, y) = -Sigma( P(x, y) * log( P(x, y) ))
+ * Conditional Entropy - randomness of one variable given another variable:
+ 	* H(y | x) = -Sigma( P(x, y) * log( P(y | x)))
+ * if x and y are independent, P(y | x ) = P(y), so is H(y | x) = H(y), H(x, y) = H(x) + H(y)
+ * although conditional entropy can tell us when two variables are conditionally independent, it is not an adequate measure of dependence:
+ * H(y | x) - this may be small if x tells us a great deal about y, or it may be small because H(y) is very small
+ * so we use Mutual Information:
+ * I(x, y) = H(y) - H(x|y)
+ * Mutual information is a measure of the reduction of randomness of a variable, given knowledge of some other variable
+ * Kullback-Leibler(KL) Divergence
+ * Mutual Information is a case of KL Divergence
+ * Measures the similarity(distance D) between two distributions:
+ 	* p, q - distros to measure the distance between:
+ 	* D(p || q) = Integral( P(x) * log( P(x)/P(q)) ) - always non-negative, Zero when p = q
+ * When is KL Divergence used - usually in supervised learning, we try to model the data after some well known distribution
