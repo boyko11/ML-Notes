@@ -120,8 +120,11 @@
 	* It's OK to misclassify examples you will almost never see - since they are so rare, they will not impact the true error much
 	* On the other hand you want to correctly classify common examples, so you have a low true error
 * Version Space is epsilon-exhausted iff all the hypotheses in the Version space have error <= epsilon
-* Hausler Theorem: m >= 1/epsilon * (ln(|H|) + ln(1/delta)) - upper bound on training samples that the Version Space is not epsilon exhausted - 
+* Hausler Theorem: how much data do we need to knock out the hypos that have error > epsilon - |H|*(1 - epsilon)^m <= |H|*e^(-epsilon*m)
+* Hausler Theorem: m >= 1/epsilon * (ln(|H|) + ln(1/delta)) - upper bound on training samples that the Version Space is NOT epsilon exhausted - 
 * If you know the size of your Hypothesis Space and you know what your target epsilon and delta are, from the above line, you'd know how many samples you need so you can be PAC
+* If the target concept is not in H - agnostic learner - needs to find the hypo that is closest to the target concept - 
+* m >= 1/(2*epsilon^2) * (ln(|H|) + ln(1/delta))
 
 ## VC Dimensions
 
@@ -145,7 +148,7 @@
 * What is the VC dimension of a finite hypothesys class: 
 * if d = VC(H) => there are 2^d distinct hypothesys => 2^d <= |H| => d = log2(|H|)
 * A finite hypo class, or a finite VC dimension give us finite bounds, hence make things PAC learnable
-* H is PAC learnanble iff the VC dimension is finite
+* H is PAC learnable iff the VC dimension is finite
 
 ## Bayesian Learning
 
@@ -199,3 +202,79 @@
 
 * Naive Bayes:  P(V|a1, a2,.....,a_n) = ( Product_i(P(a_i | V)) * P(V) ) / Z ; Z is normalization over P(a_i | V)
 * MAP(Max aposteriori) CLass = argmax_v P(V) * Product_i(P(a_i | V))
+
+## Randomized Optimization
+* X belongs to the Reals - take derivative of the function and set it to Zero, the x solutions would be the optimal values
+* Optimization Approaches:
+	* Generate and Tests - feasible only for small input spaces; it also helps for some crazy functions - it may be easier to just plaster it with possible values, then try to reason about it
+	* Calculus - can do, but assumes the function is differentiable and we can solve for its derivative equals 0
+	* Newton's method - gradient descent(or ascent): guess a position, calculate the derivitave at the position, next guess is in the direction of ascent(or descent)
+	* Newton's methid may NOT work if there are multiple optima
+* If big input space, no derivative(or hard to calculate derivative), complex function, multiple local optima...then other options:
+* Hill Climbing, pick a point find neighbors, move in the direction of the best neighbor until there aren't better than you neighbors
+* This doesn't solve the mutliple local optima set-up, for that:
+* Randomized Hill Climbing Restarts - you try multiple times with random different starting points with the hope that from least one you'd be able to Hill Climb to the global optimum
+* It's cheap - The is just lenearly more expensive than the single Hill Climb
+* Basin of attraction - sometimes the optimum can be reached from a really small percentage of the input space, so we'd have to make sure we cover as much of the input space as feasibly possible
+* RHC may not do better than evaluating the whlose space in the worst case, but may not do any worse(assuming we keep track the evaluated values, so we don't re-evaluate them)
+* RHC also depends a lot on the size of the attraction basin - if it is big, RHC works well, if it is very small, it is less of a win
+* Another way to combat mutltiple local optima:
+* Simulated Annealing(based on methalurgy - when hot, lots of energy molecules just jump around like crazy, as it cools off things jump arund less, until they eventually settle)
+* Annealing Algo:
+	* pick random x in X
+	* for a finite set of iterations:
+		* SAMPLE a neighbor x_t
+		* if fitness(x_t) >= fitness(x) - jump to x_t
+		* else P(x, x_t, T) = e^(fitness(x_t) - fitness(x) / T) - probability of jumping to the sampled neighbor
+		* decrease temperature T 
+
+	* At high temperatures, you always jump, since P has a large value, as temperaure decreases, it becomes less likely to jump to less fit neighbors
+	* Decrease T slowly so we give it a chance to go towards where the high value points are
+	* The algo has a remarkable property - the higher the fitness of a point is, the more likely it is for simulated aneealing to converge to it:
+	* Pr(ending at x) = ( e^(fitness(x)/T) ) / Z_t(normalization) - Boltzmann Distribution
+
+* Genetic Algorithms
+* Population of individuals(hypothesys)
+* Local Search - mutation (tweak the individual(hypothesis))
+* CrossOver - combine two individuals(hypos)
+* The last two will get you to the next generation
+* Population like paralel random restarts
+* GA Skeleton:
+	* P_o - initial population of  of size_k
+	* Repeat until convergence:
+		* compute fitness of all individuals in P_t(Population at time t, current Generation)
+		* select most fit individuals (top half(truncate), weighted probability(roulette wheel))
+		* pair up the most fit individuals, replacing least fit individuals via crossover/mutation
+
+* One point cross-over:
+	* choose one of 9 positions, then flip flop:
+	* child 1 gets the bits to the left of the random position of parent 1 at the same positions and the bits to the right from parent 2 at the same positions
+	* child 2 gets the bits to the left of the random position of parent 2 at the same positions and the bits to the right from parent 1 at the same positions
+* Inductive bias of one point x-over - locality of bits matter; subspace to optimize -  assumes there are pieces that are right and if we can reuse these pieces, we can get even better
+* If locality doesn't matter(it hudlling together doesn't matter), another way to cross over:
+* Flip the bits at random positions - every bit comes from one of the parents
+* If there are sub-pieces that are correct that may be preserved in the offspring
+* this is called Uniform cross-over - this is the way we get our genes from our parents
+
+* Mimic
+* Generate samples from P_Theta_t(x)
+* Set Theta_t+1 = n-th percentile
+* Retain the only the samples whose fitness is better that Theta_t+1
+* Estimate P_Theta_t+1(x)
+* Repeat
+* This should work if:
+	* We can estimate P_Theta_t+1(x) - given a finite set of data, can we estimate the probability distribution
+	* P_Theta_t is close to P_Theta_t+epsilon
+
+* Dependency trees:
+* allow you to capture some relationships between the features(Maximum spanning tree in Information between parent and children):
+* p(x) = Product_over_i(p(x_i | parent(x_i))
+* while not having to pay exponantial cost for the estimation(the true dependency would require for every feature to calculate exponentially costly prob - p(x) = P(x1| x2...x_n)*P(x2| x3...x_n)*...*P(x_n)
+
+* Mimic does well with structure - while RHC, GA can sometimes get confused by two different values that are optima, Mimic does well
+* Though it usually doesn't happen, Mimic can get stuck in local optima
+* Mimic gets randomized restarts for free, via its probabilistic nature
+* For all these nice properties, we pay a price in time complexity:
+* Mimic usually takes far fewer iterations, but the per iteration cost if far greater - prims algo, draw from distro, remove unfit Xs, estimate probabilities, construct dependency tree, etc
+* Mimic is worth using when the Fitness function is very expensive - since there are far fewer iterations, you'd have to compute the fitness function for every X, far fewer times
+* Examples of expensive fitness functions: function the performs a detail simulation of how a rocket ship performs
