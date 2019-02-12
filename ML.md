@@ -78,11 +78,50 @@
 
 ## Boosting
 
-* Finding many rough rules of thumb, is easier than finding a single highly accurate prediction rule
+* Ensemble Learning general form:
+	* Learn over a subset of the data - this generates a rule
+	* Keep learning over different subsets of the data and generate rule for each
+	* Combined the learned rules into one complex rule
+* Example
+	* Pick data uniformly at random - run a a Learner on it
+	* Average the results from each learner
+* Ensemble zero order polynomial, each learner gets a single data point - you combine all learners - they get you the mean - this just like N-NN
+* Learning a bunch of third order polynomials on a buch of random subsets and averaging these third order polynomials does better than
+* Learning a single third order polynomial on the entire set
+* Because: It's sort of like online cross-validation. Not trying to fit all possible points by using a subset, it manages to find the important structure, rather than being misled by any of the individual points.
+* You don't get trapped by a few noisy points, you sort of average out all the variance and the differences
+* This is called Bagging or Bootstrap Aggragation
+
+* Error: Pr_D( h(x) != c(x))
+* Every time we see a bunhc of examples, we are gonna make the harder ones more important to get right
+* You work with probability distros for the records - the ones we get wrong, we assign a higher probability to get drawn for the next round
+* Weak Learner - no matter what the distro over your data is, it will do better than chance - Pr_D( h(x) != c(x)) <= 1/2 - epsilon - no matter the distribution, epsilon some really small number
+* Another way of saying this - you always get some information from the Learner
+* If there IS a distribution for which none of the hypothesys will do better than chance, this means There is NO WEAK learner.
+* Having a WEAK learner is a pretty STRONG condition - you have to have many hypotheses that do well on many examples
+* Boosting high level algo:
+	* Given training examples (x_i, y_i) y_i is -1 or 1
+	* For t = 1 to T
+		* Construct D_t
+		* Find WEAK classifier h_t(x) with small error -  epsilon_t = PR_D_t(h_t(x) != c(x)) < 1/2
+	* Output final H(x)
+
+* D_t - start with uniform, then
+* D_t+1(i) = (D_t(i) *  e^(-alpha_i * y_i * h_t(x_i)) ) / Z_t, where alpha_t = ( (1/2) * (1 - epsilon_t)/epsilon_t)
+* if y_i and h_t(x_i) disagree, this will drive D_t(x_i) up, if they agree, it will drive D_t(x_i) down
+* instances that were incorrectly classified will have a greater probability of being drawn in the next round
+* instances that were correctly classified will have a smaller probability of being drawn in the next round
+* H_final(x) = sign( Sigma_t( alpha_t * h_t(x)))  - alpha_t - greater if you error is lower = > more accurate learners get higher weight
+
+* Finding many rough rules of thumb, is easier than finding a single highly  accurate prediction rule
 * When there IS a distribution for which none of the hypotheses does better than chance, there is NO WEAK learner for this hypothesys space(All the learners are weaker then weak - error >= 1/2)
 * You can combine simple things to get comlicate things, e.g. you combine linear separators as a weighted average you get a non-linear separator - that's why boosting works
 * General feature of ensemble methods: if you try to look at some particular hypothesys class, because you are doing weighted average over hypotheses drawn from that hypothesys class, the final combined hypothesys is at least as complicated as the original hypothesys class.
-* Part of the reason that we are getting a non-lenear final hypo is because at the end we pass the weighted average through a non-linear funtion - the SIGN
+* Part of the reason that we are getting a non-linear final hypo is because at the end we pass the weighted average through a non-linear funtion - the SIGN
+* we are able to get simple hypos, add them together in order to get a more complicated ones - the simple ones are local, sort of like localized linear regression in KNN
+* You are able to be more expressive, even though you are using simple hypotheses, because you are combining them in some way
+* Boosting is agnostic to the learner - you can plug in any type of learner(as long as it is a weak learner)
+* Boosting testing learning curve never goes up, it just keeps getting better and better and better
 
 ## SVM
 
@@ -94,9 +133,26 @@
 * an easier problem to solve is (||w||^2)/2, because it is quadtratic optimization problem and these are well studied
 * The above one somehow turns into w = SIGMA of alpha_i * y_i * x_i; when we recover the w's, we can get the b(follows from the line above the line above)
 * most of the alphas end up being Zeros, so only few alphas matter - the ones that are closest to the margin lines - these are called the Support Vectors
-* Kernel - way to measure similarity, in the Linear SVM, it is (x_i dot x_j) - the dot product would be large positive if they are similar, large negative if dissimilar
+* W(alpha) = Sigma_i(alpha_i) - 1/2 * Sigma_i_j( alpha_i*alpha_j * y_i*y_j * (x_trans_i*x_j) )  - meaning:
+* alpha_i*alpha_j - figure out which points matter for your decision boundary
+* y_i*y_j - how do they relate to one another in terms of their output labels with respect to...
+* x_trans_i*x_j - how similar they are to one another
+* Kernel Trick - we can substitute the (x_trans_i*x_j) with any measure of how two points are alike or how they are different - in the case of a origin centered circle (x_trans_i*x_j)^2
+* You can't just use ANY transfromtaion, but in practice you can use ALMOST anything:
+* for any function that you use, there is some transformation into a higher dimensional space that is equivalent, though it may trun out you need an infinite number of dimensions to represent it
+* K - Kernel the W(alpha) can be written as
+* W(alpha) = Sigma_i(alpha_i) - 1/2 * Sigma_i_j( alpha_i*alpha_j * y_i*y_j * K(x_i, x_j) )
+* Kernel - way to measure similarity, in the Linear SVM, K returns (x_trans_i dot x_j) - the dot product would be large positive if they are similar, large negative if dissimilar
 * Kernel - way to inject domain knowledge into the SVM
+* K = (x_trans_i dot x_j) - Linear
+* K = (x_trans_i dot x_j)^2 - Origin Centered Circle
+* The above two can be generalized to:
+* K = (x_trans_i dot x_j + c)^p - polynomial kernel
+* K = e^-( (||x_i - x-j||^2) / (2*sigma^2) ) - radial basis function kernel
+* K = tanh(alpha*x_i*x_j + theta)   - sigmoid like
 * Kernels need to satisfy the Mercer condition
+* We can think of SVMs as being EAGER LAZY learners or ONLY as LAZY as Necessary, because the classifier was dependent on just subset of the data - the support vectors
+* Eager - you still train using all the data so you find your support vectors, but when classifying only the support vectors matter so Lazy in that sense
 * As you add more and more weak learners, the boosting algo becomes more and more confident in its answers, it effectively creates a larger and larger margin
 * Larger margin minimizes overfitting
 * If Boosting uses ANN with many layers and neurons, then boosting may overfit.
