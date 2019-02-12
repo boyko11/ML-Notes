@@ -1,5 +1,20 @@
 # Machine Learning Notes
 
+## Decision Trees
+* Algo
+	* 1. Pick the best attribute - Best: splitting things roughly in half(minimize entropy maximize mutual information)
+	* 2. Ask question
+	* 3. Follow the path
+	* 4. Go to 1
+	* Until you ge the answer
+* Boolean AND:
+
+   	 A
+  1 / \ 0
+   B   F
+1 / \ 0
+ T   F
+ 
 ## Neural Nets
 
 * Standard Gradient Descent vs Stochastic Gradient Descent
@@ -121,7 +136,8 @@
 * we are able to get simple hypos, add them together in order to get a more complicated ones - the simple ones are local, sort of like localized linear regression in KNN
 * You are able to be more expressive, even though you are using simple hypotheses, because you are combining them in some way
 * Boosting is agnostic to the learner - you can plug in any type of learner(as long as it is a weak learner)
-* Boosting testing learning curve never goes up, it just keeps getting better and better and better
+* Boosting does not alway overfit
+* Boosting's testing learning curve may never go up, the error may continue decreasing
 
 ## SVM
 
@@ -165,6 +181,16 @@
 	** Use a dual representation
 	** Operate in a Kernel induced feature space - f(x)=∑αiyi φ(xi),φ(x) +b  is a linear function in the feature space implicitly defined by K
 * Bad Kernel would have a mostly diagonal Kernel matrix - all points orthogonal to each other - no structure, no clusters
+* In SVMs we fight overfitting by trying to find the classifier with the max margin
+* As we add more and more weak learners, the confidence of the classification grows: H_final(x) = Sign(Sigma_t(alpha_t * h_t(x)) / Sigma_t(alpha_t))
+* As we add more and more weak learners, the error may stay the same, but the confidence of prediction grows
+* i.e. if we measure confidence of how close H_final is to -1 or 1, the negative predictions will be getting closer to -1, the positive to +1
+* i.e the margin between the positives and negatives will grow
+* Large margins tend to minimize overfitting
+* Boosting will overfit if the underlying weak learners overfit, e.g. NN may fit the data perfectly, then all the records will get the same weights in the distro for teh next round,
+* Then you end up sampling the same or very similar subset of the data, then you end up fitting the same or very similar NN
+* In the end, the weighted sum of the same thing is that thing and you overfit
+* Bostting also tends to overfit in the case of 'Pink noise' - pink noise is uniform noise
 
 ## Comp Learning Theory
 
@@ -374,3 +400,10 @@
  	* p, q - distros to measure the distance between:
  	* D(p || q) = Integral( P(x) * log( P(x)/P(q)) ) - always non-negative, Zero when p = q
  * When is KL Divergence used - usually in supervised learning, we try to model the data after some well known distribution
+
+ ## Parametric vs Non-parametric
+ * Parametric - fixed number of params, e.g fit a line through a points y = theta_0 + theta_1 * b
+ * Non-parametric - potential for infinite number of parameters - KNN, DT
+ 	* As data grows, so do the number of parameters describing the data, e.g. the same straight line we fit through Linear Reg, could be a polynomial with many degrees if we use KNN
+ * SVM's could be considered eager lazy learners - if we use a Non-Linear kernel, we end up emulating KNN(for wharever the Kernel defines as a neighbor) at training time
+ * It may be more fitting to say SVM's are eager non-parameteric learners, since they could end up having infinite number of parameters just like KNN(they could literally use KNN as a Kernel), but since they do it at training, rather than query time, they are eager
