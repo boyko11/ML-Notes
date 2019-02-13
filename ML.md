@@ -66,9 +66,65 @@
 		* Output: average, local linear fit, etc
 
 ## Regression and Classification
- 
+
+* Lin Reg
+* Best Fit line - the line that minimizes the squared error of y distances - least squared error
+* Use Calculus to find it - gradient descent of the Error function:
+* E(m, b) = Sigma_i( (y_i - (mx + b))^2 )
+* We are using the SSquaredE, because it is smooth and well behaved in a Calculus sense
+* It has also been proven that using SSE results in the Maximum Likelihood Hypothesys
+* constant line:
+	* E(c) = Sigma_i( (y_i - c)^2 )
+	* Derivative_wrt_c( E(c)) = Sigma_i( 2*(y_i - c)* -1)
+	* Derivative_wrt_c( E(c)) = -2*Sigma_i(y_i) + 2*Sigma_i(c)
+	* Derivative_wrt_c( E(c)) = 0 at the min =>
+	* Sigma_i(c) = Sigma_i(y_i) <==>
+	* n * c = Sigma_i(y_i) =>
+	* c = Sigma_i(y_i) / n    
+	* this is the mean y value - the best fit horizontal(constant line) is the average of all y's
+* Order of polynomial:
+	* 0 - constant
+	* 1 - line (mx^1 + b)
+	* 2 - parabola c2 * x^2 + c1 * x^1 + c0
+* You can fit as higher of polynomial as the number of training records - but this would overfit - fit the training data too well - won't be general enough
+* As the number of degrees increase, although you'd get a super low and possibly zero training error, the testing error at some point would start going up
+* Trying to find the best c's
+* c0 + c1*x + c2*x^2 + c3*x^3 = y
+* [ 1  x_1 x_1^2 x_1^3]   *   [ c0      = y1
+  [ 1  x_2 x_2^2 x_2^3]         c1        y2
+  [ 1  x_3 x_3^2 x_3^3]         c2        y3
+  [...................]         c3 ]     ...
+
+* X * w = Y
+* X_t*X*w = X_t*Y
+* Inverse(X_t*X) * X_t*X * w = Inverse(X_t*X) * X_t * Y
+* w = Inverse(X_t*X) * X_t * Y
+* X_t * X - has nice properties - it is invertible and it does the right things in terms of minimizing the least squares - it does it as a projection
+
+* Errors - data is noisy; sensors are noisy; data might be tamperred with, intentionally or not; transcription errors; unmodelled influences, variables that matter aren't captured
+* How to minimize modelling the errors, rather than the underlying function:
+* Cross Validation:
+* The Test is Representative -  a stand-in for the distribution of the real data
+* The data is assumed to be IID - Idependent Identical Distribution - the Training set , the Testing set and the real world data are assumed to be from the same distribution
+* We are trying to use a model that is complex enough to fit the data well, yet not to complex so it does well on the test data and generalizes well to the unseen data
+* If we don't have access to the Test Set - we can hold out some of the train set and use it as a stand-in for the test data - cross-validation set
+* CrossValidation - k-fold - break the train set to k folds; 
+* for each fold, fit the model using this fold as the test set and the rest of the folds combined as a training set
+* average the test error from each testing fold - that's your cross-validation error
+* select the model for the fold that caused the lowest error
+* CV learning curve for the polynomial curve fitting - falls and gets close to the training error, but then rises as the degree of the polynomial rises
+
 ## Neural Nets
 
+* Perceptrons are linear function that always that computes hyperplanes
+* Perceptrons always compute these half-planes
+* There is a dividing line equal to the threshold
+* anything above(or to the left) positive, anything below(or to the right) - negative
+* w1*x1 + w2*x2 >= theta - positive
+* w1*x1 + w2*x2 < theta - negative
+* AND, OR and NOT are representable as perceptron units
+* show weights:
+* 
 * Standard Gradient Descent vs Stochastic Gradient Descent
 	* In Standard the error is summed up over all training records, then the weights are updated
 	* In Stochastic the error is calculated for the individual training instance and the weights are update immediately - for each training instance
