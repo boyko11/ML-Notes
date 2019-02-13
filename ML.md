@@ -14,6 +14,58 @@
    B   F
 1 / \ 0
  T   F
+
+* Boolean OR - mirror of AND
+* Boolean XOR - full tree
+* N-Or needs N nodes, so does N-And. both are knowns as ANY - the number of needed nodes is O(n) with respect to the number of attributes
+* N-Xor - even or odd parity; odd parity if the the number of T is odd, then it outputs T, othrwise F
+* Need 2^(n-1) nodes for N-Xor tree - aka HARD, since it is exponential
+* To solve problems with DT, we look for 'ANY' type of problems over 'HARD' type of problems
+* Number of all possible decision trees over binary attributes with binary outcomes:
+* n attributes 2^n possible node set-ups, this is without the all possible outcomes
+* how many possible outcomes are there, this si the same as asking, how many number can we represent with a 2^n binary string
+* or how many possible combinations are there for 2^n binary variables - 2^(2^n) =>
+* The Hypothesys space of decision trees is very expresive
+* This also means that you MUST have some clever way to search through them
+* ID3
+	* Loop:
+		* Pick A <- best attribute
+		* Assign A as decision attribute for node
+		* For Each Value of A create a descendent on node
+		* Sort training example to their corresponding A value leaves
+		* IF Perfectly classified - STOP
+		* ELSE go back to Loop without considering this attribute A anymore
+* Best Attribute - the one with the highest information Gain
+* Gain(S, A) = Entropy(S) - Sigma_v( (|S_v|/|S|) * Entropy(S_v) )
+* Entropy - measure of randomness
+* -Sigma_v( p(v) * log( p(v) ) )
+* The best attribute is the one with the maximum gain
+* Restriction Bias - what kind of restriction do you have on your hypothesis, e.g. when doing DT, we are ONLY considering DT, not lines, poly curves, etc
+* Preference Bias - what sort of hypothesys from the possible  hypothesis set we PREFER, that is at the heart of INDUCTIVE BIAS
+* ID3 Bias
+* Prefers good splits near the top - given two trees that perfectly fit the training data, ID3 would pick the one with better splits at the top
+* Prefers trees that produce the correct answer
+* ID3 Prefers shorter trees. This comes naturally from good splits at the top - you gonna take trees, that separet the data well early(at the top), over tress that produce useless splits, hence growing the tree size unnecessarily
+* Continuous Attributes
+* Does it make sense to repeat an attribute along a particular path on the tree
+	* If it is a continuous one, yes, for example you split on age -50+ at the top, but then you split on another age value farther down
+	* If it is a boolean Attribute, NO, it doesn't, since you've already split on it some time ago on the upstream, you would have only instances with the sane value for that attribute, so there really isn't anything to split one, i.e. if you split on it it would just create only one child node, which won't help. The latter would be automatically picked up by ID3, because this would be the worst attribute to split on
+* ID3 - when do we really stop?
+	* When everything is classified correctly
+	* No more attributes to try
+	* Does it makes sense to trust our data and fit it perfectly?
+	* NO - this is overfitting - you fit even the noise
+	* Complex, big trees tend to overfit
+	* CrossValidation - you set some data aside and you see which tree does best on it
+	* You could also check against the validation set anytime after you grow the tree by one level.
+	* If you start getting worse scores on the validation set, it is time stop growing that tree. Which is just computer speak, in real life, you want to let real trees grow, cuz we need more of those
+	* You could also do pruning - you let ID3 build the full tree, then start removing a subtree at a time and see what happens with the validation score. You keep pruning until the validation score stops improving.
+	* There are variations of that. You could keep pruning until the validation set deteriorates significantly, for some definition of significant. The idea is to create a smaller, less complex tree, that generalizes better.
+	* Regression Trees 
+		* How do we split - variance? SSE, correlation
+		* Output: average, local linear fit, etc
+
+## Regression and Classification
  
 ## Neural Nets
 
