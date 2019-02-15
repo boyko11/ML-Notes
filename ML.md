@@ -124,20 +124,49 @@
 * w1*x1 + w2*x2 < theta - negative
 * AND, OR and NOT are representable as perceptron units
 * show weights:
-* 
+* AND X1: 1/2  X2: 1/2  Theta: 3/4
+* OR  X1: 1    X2: 1    Theta: 3/4
+* NOT X1: -1   Theta: 0
+* XOR: OR - AND ( 0 1 1 1 ) - ( 0 0 0 1) = ( 0 1 1 0 )   X1: 1     X2: 1     AND: -2   Theta: 3/4
 * Standard Gradient Descent vs Stochastic Gradient Descent
 	* In Standard the error is summed up over all training records, then the weights are updated
 	* In Stochastic the error is calculated for the individual training instance and the weights are update immediately - for each training instance
 	* Because it uses true gradient, standard gradient descent is often used with larger learning rate(step size) per weight udate than Stochastic Gradient Descent.
 	* Stochastic GD could avoid falling into local minima, because its direction of ascent varies more than the Standard GD
 
-* Perceptron vs Delta Rule
-	* If the data is linearly separable, the perceptron rule converges after a finite number of iterations
-	* The delta rule does NOT requre data be lineraly separable, but it only converges asymptotically towards the min error, possibly requiring unbound amount of time
+* Perceptron rule
+* y_hat = Sigma_1_through_n(w_i*x_i) >= theta, we subtract theta from both sides
+* y_hat = Sigma_i(w_i*x_i) >= 0, with the first i = 0, x0 = 1, notice the >= 0, if the left side is >= 0 y_hat is 1, otherwise y_hat is 0
+* w_i = w_i + delta_w_i
+* delta_w_i = alpha(y - y_hat)*x_i
+* y - label, y_hat - output, alpha - learning rate
+* if the output is correct - no weight change
+* if the label(y) is 1, but the output(y_hat) 0, this means that the current weight is not large enough, so we have to bump it up, hence delta_w in direction of x_i
+* if the label(y) is 0, but the output(y_hat) 1, this means that the current weight is too large, so we have to take it down, , hence delta_w in direction opposite of x_i
 
-* Perceptron's discontinuous threshold function makes it undifferentiable, hence not suitable for gradient descent
+* Gradient Descent - more robust to non-linear separability
+* No thresholding
+* E(w) = 1/2 * sigma_m((y_m - (sigma_i(x_m_i * w_i)))^2 )
+* some derivation later
+* derivative_of_the_error_wrt_w_i = sigma_M(y - a)(-x_i)
+
+* perceptron guarantee: delta_w_i = alpha(y - y_hat)*xi - finite convergence guaranteed when data is linearly separable
+* gd: calculus        : delta_w_i = alpha(y - a)*x_i
+
+* Perceptron vs Delta Rule
+	* The Perceptron will use the thresholded output, the delat rule will use the untrhesholded output
+	* If the data is linearly separable, the perceptron rule converges after a finite number of iterations
+	* The delta rule does NOT require data be lineraly separable, but it only converges asymptotically towards the min error, possibly requiring unbound amount of time
+
+* Perceptron's discontinuous threshold function makes it indifferentiable, hence not suitable for gradient descent
+
+* So we turn the thresholding into a sigmoid function instead of sigma_i(w_i*x_i) >=0 , we do 1/(1+e^-(w_i*x_i))
+
+* Now we can differentiate the thresholding function
 
 * Derivative of sigmoid = sigmoid(w*x) * (1 - sigmoid(w*x)) - it approaches zero for larger positive numbers; it approaches zero for smaller negative numbers
+
+* Backpropagation: computationally beneficial organization of the chain rule
 
 * Momentum term in backprop - helps to get through local minima(though it may also get you through a global minimum :); helps to ge through flat regions; helps to get trough steep regions faster
 
@@ -145,7 +174,28 @@
 
 * When in local minima with respect to one of the weights, you may not be in local minima with respect to the other weights. The more weights, the more escape routes away from this single dimension's local minima
 
-* Inductive bias - smooth interpolcation between data points - given two +ve examples with no -ve examples between them, BACKPROP tends to label the points in between as positive as well
+* The more nodes, the more layers, the more cmplex the network, the more likely it is to overfit => regularization - keep the weights within reasonable range
+
+* complexity is also related to the scale of the weights - you can overfit because of some weights being too large
+
+* Restriction Bias - Perceptrons are linear, so they restrict us to planes; beyond that NNs are not very restrictive in terms of what function they can represent:
+* Boolean - network of threshold like units
+* Continuous  - as long as it is connected(no jumps) - we can represent it with a single hidden layer, as long as there are enough units in that layer. We can think of this as each hidden unit being in charge of one small patch of the continuos function being modeled. All the patches get stiteched together at the output
+* Arbitrary - just add one more hidden layer, which would account for the jumps, that couldn't be handle at the continuous layer. more or less you take multiple continuous networks as your input and you stitch them together
+
+* Preference Bias:
+* Prefer simpler networks
+* Prefer smaller weights
+* Start with random small weights
+* Random - just try different things so you don't get stuck in the same local minima
+* Small - so you avoid overfitting
+* Prefer correct over incorrect(not sure that won't be a preference for any algo), but all things being equal, prefer the less complex network with smaller weights
+
+* Given there isn't much restriction, we can come up with arbitrarily complicated networks - this may result in overfitting.
+* To combat that, we use something of the likes of pre-prunning - you come up with sufficintly robust, but not too complicated NN architecture, e.g. hey I'm gonna have only two hiddne layers, the first will have 16 units, the second 8
+* Or we can use CV to decide how many hiddne layers to use, how many nodes to put in each layer, or we can use it to decide when to stop training, because the weights are not too large
+
+* Inductive bias - smooth interpolation between data points - given two +ve examples with no -ve examples between them, BACKPROP tends to label the points in between as positive as well
 
 * Backpropagation is susceptible to overfitting the training examples at the cost of decreasing generalization accuracy over the unseen examples
 
@@ -166,15 +216,17 @@
 
 
 ## KNN
-
+* 1 downside of remembering is no generalization, you may not find a record that exactly matches the query point
+* 1-NN will likely overfit, especially if the query point and the training point are identical - you may model the noise
+* It is also possible that the query matches different records - same feature data, but different labels
 * Many techniques construct function approximation only on the neighborhood of the query.
 * Not generalizing over the entire instance space could be very beneficial when the target function is very complex
 * Cost of classifying can be high - all computation take place at classification time.
-* KNN and similar, usually consider all attributes. If the target concept depends only on some, but not all attributes, similar instances might be far away in eucledian space
+* KNN and similar, usually considers all attributes. If the target concept depends only on some, but not all attributes, similar instances might be far away in eucledian space
 * Locally Weighted Regression can be viewed as generalization of KNN
 * KNN never forms explicit general hypothesis for the target function
 * KNN classification - you count your neighbors and classify as the highest count for a class. Regression - you take the mean of the neighbors.
-* KNN - you can also weight by distance. The closer the nighbor is, the higher the weight in the vote or in calculating the mean. One possible weight calculation - 1 / distance^2. If the distance is 0, assign the label of the 0 distance training instance as a class(or projection) for the query record. If more than one zero distance training records - majority(or mean)
+* KNN - you can also weight by distance. The closer the neighbor is, the higher the weight in the vote or in calculating the mean. One possible weight calculation - 1 / distance^2. If the distance is 0, assign the label of the 0 distance training instance as a class(or projection) for the query record. If more than one zero distance training records - majority(or mean)
 * Weights allow considering all training records. If all training records are considered - tha algo is called Global, if only the k-nearest records are considered, the algo is called Local. Global methods would be slower, since the computation would be more expensive.
 * Taking weighted average over k-nearest neoghbors, can smooth out the impact of isolated noisy records
 * Inductive bias - similarity is assumed by closeness in eucledian space
@@ -198,6 +250,21 @@
 * RBF's local approximations are not specifically targeted to the query point, because it is an eager algo => it is still a global and eager algo
 * Eager algos are more restrictive because they must commit to a signle hypothesis that covers the entire instance space
 * Even local approximation eager methods such as RBF, do not allow for customization to unseen query instances
+
+* Preference bias - the thing that encompasses our belief about what makes a good hypothesis
+* KNN preference bias
+	* Near Points are similar
+	* Smoothness - averaging
+	* All Features matter equally
+
+* Curse of dimensionality
+* As the number of features or dimensions grows, the amount of data we need to generalize accurately grows exponentially
+* If you want your neighborhood to be small, you'd have to fill it up with data x's between 1 and 10 - 10; x1 and x2 between 1 and 10 - 10^2, 3D - 10^3 - exponential growth
+* You are better of giving it more data, than giving it more dimensions
+* Free Lunch Theorem: An learning algo that you create, is going to have the property that if you average over all the possible instances, it is not doing any better than random
+* A practical way of thinking about this is: If I don't know anything about the data that I need to learn over, it doesn't matter what I do, because there are all kinds of possible data sets
+* However, if I have the domain knowledge, I can use that to choose the best learning algorithm
+
 
 ## Boosting
 
