@@ -369,6 +369,31 @@
 
 ## Comp Learning Theory
 
+* Sample Compexity - the fewer samples an algo it needs in order to generalize effectively, the better it is at learning
+* Defining Inductive Learning:
+	* Learning From Examples
+	* Probability of successfull training - 1 - delta
+	* Number of examples to train on - m
+	* Complexity of hypo class - comlexity of H
+	* Accuracy to which target concept is approximated - epsilon
+	* Manner in which training examples presented - batch(here are all training samples)/online(here's one example - give me a label, there's another one...)
+	* Manner in which training examples selected
+		* Learner asks teacher - here is X, teacher responds with c(X)
+		* Teacher chooses Xs and their corresponding c(X) and gives them to the Learner
+		* Fixed Distribution - x, c(x) chosen from D by nature
+		* Evil worst distribution
+
+	* The teacher could tell the learner to ask the only question that matters - e.g. IS the person Charles Isbell? - learner turns around and asks, teacher responds with an 'Yes'
+	* Teacher has the advantage of knowing the answer
+	* If the Learner initiates to exchange(hey teacher, what's the label for x), the learner needs a question that elminates as many hypotheses as possible. similar to DT, find the question that splits the labels best - log(n)
+	* Back to Teacher providing questions - there usually is a constraint, you can't just provide the ultimate question
+	* k-bit input strings, if attribute can take on 3 possible values - 3^k possible hypos
+	* the teacher can give some positive examples, which would help the learner detrmine what's irrelevant - bit indices that differ are irrelevant
+	* the the teacher can provide some negative examples - which help the learner finalize what is relevant - try flipping each bit fro the bits you currently consider relevant - if the label doesn't change - the attribute is relevant
+	* Learner with constraint queries - in the worst case, you'd have to enumerate all possible hypos before finding the only one correct one -  for a k-bit string there are 2^k possible ones. The learner is linear in the |H|, but exponential in K
+	* Learner with mistake bounds
+
+
 * Consistent Learner - learner consistent with the data - learned to produce the the training labels
 * Version Space - all the hypotheses consistent with the training data(all the correct hypotheses with respect to the training data)
 * True error vs Training error
@@ -512,6 +537,12 @@
 * Flip the bits at random positions - every bit comes from one of the parents
 * If there are sub-pieces that are correct that may be preserved in the offspring
 * this is called Uniform cross-over - this is the way we get our genes from our parents
+
+* Backprop moves slowly from one hypo to a new very similar hypo. This makes backprop prone to falling in a local optimum. In contrast, GA can move abruptly since an offspring can be very different from its parent. Also since GA maintains populations, there are multiple hypos at the same time, covering multiple points of the search space, Hence GA is much more immune to falling into a local optima.
+* Schema Theorem: More fit schemas will tend to grow in influence, especially schemas containing a small number of defined bits(containing a large number of '*') and especially when these defined bits are near one another
+* Lamarkian Evolution - the experiences of an individual directly affects the genes passed onto that individual's offspring <=> there is a direct relation between an individual evolution and species evolution. Most disagree, but the concept has been applied successfully in GA
+* Baldwin effect - similar to Lamark's idea - though it is more like survival of the fittest: If a new predator appears, only the species who LEARN how to avoid it survive and pass their genes on.
+* An application of the Baldwin effect would be a NN with some weights allowed to adjust themselves
 
 * Mimic
 * Generate samples from P_Theta_t(x)
