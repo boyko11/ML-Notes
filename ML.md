@@ -392,9 +392,15 @@
 	* the the teacher can provide some negative examples - which help the learner finalize what is relevant - try flipping each bit fro the bits you currently consider relevant - if the label doesn't change - the attribute is relevant
 	* Learner with constraint queries - in the worst case, you'd have to enumerate all possible hypos before finding the only one correct one -  for a k-bit string there are 2^k possible ones. The learner is linear in the |H|, but exponential in K
 	* Learner with mistake bounds
+	* The learner asks the question about X, but it also guesses the answer - the teacher informs the learner if the guess was correct
+	* The learner would have some bound on mistakes it could make until it figures out the correct hypo
+	* If the learner guesses wrong - it better learn a lot from that
+	* if it guess right - it doesn't have to learn too much from it
+	* even if the learner needs to explore 2^n hypos - it will never make more then k+1 mistakes - because it will learn if a certain bit matters from each mistake
+	* mistake bound - how many misclassifications can a learner make over na infinite run
 
 
-* Consistent Learner - learner consistent with the data - learned to produce the the training labels
+* Consistent Learner - learner consistent with the data - learned to produce the training labels
 * Version Space - all the hypotheses consistent with the training data(all the correct hypotheses with respect to the training data)
 * True error vs Training error
 	* Training error is the percentage misclassified from the training set
@@ -402,6 +408,8 @@
 	* It's OK to misclassify examples you will almost never see - since they are so rare, they will not impact the true error much
 	* On the other hand you want to correctly classify common examples, so you have a low true error
 * Version Space is epsilon-exhausted iff all the hypotheses in the Version space have error <= epsilon
+* k - number of hypos with error > epsilon
+* Hausler Theorem:   Probability there's at least one hypo in the space with error > epsilon <= k(1-epsilon)^m - upper bounded by |H|(1-epsilon)^m
 * Hausler Theorem: how much data do we need to knock out the hypos that have error > epsilon - |H|*(1 - epsilon)^m <= |H|*e^(-epsilon*m)
 * Hausler Theorem: m >= 1/epsilon * (ln(|H|) + ln(1/delta)) - upper bound on training samples that the Version Space is NOT epsilon exhausted - 
 * If you know the size of your Hypothesis Space and you know what your target epsilon and delta are, from the above line, you'd know how many samples you need so you can be PAC
@@ -423,9 +431,12 @@
 * 3 - all possible ways = 2^3, but you can't shatter three points into a T F T arrangement, so you can't shatter an input set of 3 to 8 possible outcomes => VC Dimensions = 2
 * It's easier to get a lower bound, less hypothesis - show that there EXISTS some set of points that can shatter the hypothesys class
 * For upper bound you have to prove that NO example exists that can shatter the hypo class
+* The above two statements are translated to:
+* Can Shatter: There EXISTS a set a points of certain size, such that for all possible labelings for the points in that set, there exists a hypo that works for this labeling
+* CanNOT Shatter: For All Possible arrangement of points, there exists a labeling, which no existing hypo can make work
 * VC dimension is often the number of parameters - threshold in 1D - 1 (theta); interval in 1D - 2 ([a, b]) separator line in 2D - 3 (w1x1 + w2x2 +b);
 * 3 dimensions - 4; d-dimensional hyperplane - d+1 - d the weights for each dimensions + theta(the threshold)
-* __m <= (1/epsilon)(8*VC(H)*log2(13/epsilon) + 4*log2(2/epsilon))__ 
+* m <= (1/epsilon)(8*VC(H)*log2(13/epsilon) + 4*log2(2/epsilon))
 * The VC dimension concept it doesn't require hypothesys class be infinite, it's just that an infinite hypothesys class requires a VC dimension
 * What is the VC dimension of a finite hypothesys class: 
 * if d = VC(H) => there are 2^d distinct hypothesys => 2^d <= |H| => d = log2(|H|)
