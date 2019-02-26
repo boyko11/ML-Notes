@@ -641,3 +641,29 @@
  * pie(s, t) -> a
  * Utility of sequences
  * Stationary preference - if one sequence of states has a greater utility than another sequence of states, if we just prepend the same state to both sequences, the first one will still have greater utility than the second
+ * V(s0, s1, s2 ...) = Sigma_t( R(s_t) = Sigma_t( gamma^t * R(s_t))   0 <= gamma <= 1
+ * assume Rmax - max Reward in the sequence, we bound it by Sigma_t( gamma^t * Rmax ) = 
+ * Rmax / ( 1 - gamma)
+ * Rmax = 2 , gamma = .9 => upper bound = 2/(1 - .9) = 20
+ * Rmax = 2 , gamma = .999 => upper bound = 2/(1 - .999) = 2000
+ * lower gamma - more miopic - value immediate reward more
+ * higher gamma - value rewards into the future more
+ * Sigma_t( gamma^t * R(s_t))   0 <= gamma <= 1 - discounted rewards, discounted series
+ * allows us to go infinite distance in finite time
+ * it's a geometric series - it allows us to add infinite number of numbers
+ * It's an infinite Horizon, but by the virtue of discounting, at any given point in TIME, it only counts so many rewards in the future
+ * so the total reward you gonna get is always finite at any given time point
+ * in that sense you can only see(count) a finite time steps into the future
+ * singularity - the limit to computer power going faster is the amount of time it takes to design the next computer
+ * optimal policy - the policy that maximizes the Exepected Sum of Discounted Rewards:
+ * pie* = argmax_pie E[ sigma_t( gamma^t * R(s_t) | pie ]
+ * how good is it to be in a state s:
+ * U_pie(s) = E[ sigma_t( gamma^t * R(s_t) | pie, s0 = s ]
+ * U(s) is not to be confused with R(s) - R(s) gives us the IMMIDIATE Reward, U(s) - gives us the Long Term reward
+ * It not only prevents you from taking short-term positive things if that's gonna lead you to long-term negative things, but it also
+ * allows you to take short-term negative things, if that allows you to get long-term positive things
+ 
+ * pie_star(s) = argmax_a Sigma_s_prime( T(s, a, s_prime) * U(s_prime) )
+ * given I am in state s - which action will maximize my reward
+ * for each action do a weighted(probability you will end up at that state) average of the utility of the possible states you might end up at
+ 
