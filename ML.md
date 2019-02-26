@@ -624,3 +624,20 @@
  	* As data grows, so do the number of parameters describing the data, e.g. the same straight line we fit through Linear Reg, could be a polynomial with many degrees if we use KNN
  * SVM's could be considered eager lazy learners - if we use a Non-Linear kernel, we end up emulating KNN(for wharever the Kernel defines as a neighbor) at training time
  * It may be more fitting to say SVM's are eager non-parameteric learners, since they could end up having infinite number of parameters just like KNN(they could literally use KNN as a Kernel), but since they do it at training, rather than query time, they are eager
+
+
+
+
+ # Markov Decision Processes
+ * States
+ * Actions - A, A(s)
+ * Model - Transition Model - T(s, a, s_prime) produces Pr(s_prime| s, a) - it is stationary, once you have it, it doesn't change
+ * Reward - R(s), R(s, a), R(s, a, s_prime)
+ * Policy - pie(s) -> a : given I'm in state S, what is the most optimal action to take
+
+ * Markovian property - only the present matters
+ * Temporal Credit Assignment Problem - over multiple time steps, (s, a, r), I was in a state s, took an action a, got a reward r - figure out what the actual R is after many iterations
+ * if you have a finite Horizon, you lose stationarity - depending on the time step you are in, you may take a different action fro the same state, because you may be running out of time
+ * pie(s, t) -> a
+ * Utility of sequences
+ * Stationary preference - if one sequence of states has a greater utility than another sequence of states, if we just prepend the same state to both sequences, the first one will still have greater utility than the second
